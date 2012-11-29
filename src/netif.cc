@@ -9,6 +9,7 @@
 
 #include <net/if.h>
 #include <net/if_dl.h>
+#include <net/ethernet.h>
 #endif
 
 #if defined(linux)
@@ -17,9 +18,17 @@
 #include <linux/if.h>
 #include <netdb.h>
 #include <stdlib.h>
+#include <net/ethernet.h>
 #endif
 
-#include <net/ethernet.h>
+#if defined(__sun)
+#include <stdlib.h>
+#include <sys/sockio.h>
+#include <net/if.h>
+#include <unistd.h>
+#include <stropts.h>
+#define	ETHER_ADDR_LEN		6
+#endif
 
 #include <node.h>
 
@@ -125,7 +134,24 @@ Handle<Value> GetIFMacAddress(const Arguments& args) {
 
 #endif
 
-#ifdef SOLARIS
+#if defined(__sun)
+
+  struct ifreq s;
+  int fd = socket(PF_INET, SOCK_DGRAM, IPPROTO_IP);
+
+  // copy in the ethernet interface name
+  strcpy(s.ifr_name, (char *) *device);
+
+  if (0 == ioctl(fd, SIOCGIFHWADDR, &s)) {
+
+    // Copy link layer address data in a socket structure to an array
+    memcpy(&macAddress, &s.ifr_addr.sa_data, ETHER_ADDR_LEN);
+
+  } else {
+    ThrowException(Exception::TypeError(String::New("error opening interface")));
+    return scope.Close(Undefined());
+  }
+
 
 #endif
 

@@ -8,7 +8,8 @@ exports['awesome'] = {
   'no args': function(test) {
     test.expect(1);
     // tests here
-    test.ok(netif.getIFMacAddress('eth0'), "should not error out");
+    //test.ok(netif.getIFMacAddress('eth0'), "should not error out");
+    test.ok(netif.getIFMacAddress('net0'), "should not error out");
     test.done();
   }
 };
