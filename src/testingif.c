@@ -89,21 +89,20 @@ int main( int argc, const char* argv[] )
 
   // copy in the ethernet interface name
   strcpy(s.ifr_name, interface);
-  
+
   if (0 == ioctl(fd, SIOCGIFHWADDR, &s)) {
 
     // Copy link layer address data in a socket structure to an array
     memcpy(&macAddress, &s.ifr_addr.sa_data, ETHER_ADDR_LEN);
 
   } else {
-    printf("error opening interface\n");
+    printf("unable to open interface %s\n", interface);
     exit(1);
   }
 
 #endif
 
-  printf( "\nPrinting mac addresse for %s\n\n", interface);
-
+  printf( "\nPrinting mac address for %s\n\n", interface);
 
   printf("%02X:%02X:%02X:%02X:%02X:%02X\n", 
       macAddress[0], macAddress[1], macAddress[2], 
