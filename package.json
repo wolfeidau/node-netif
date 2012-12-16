@@ -1,0 +1,36 @@
+{
+    "name":"netif",
+    "description":"Node wrapper for net/if.h",
+    "version":"0.1.0",
+    "homepage":"https://github.com/markw/netif",
+    "author":{
+        "name":"Mark Wolfe",
+        "email":"mark@wolfe.id.au"
+    },
+    "repository":{
+        "type":"git",
+        "url":"git://github.com/wolfeidau/netif.git"
+    },
+    "bugs":{
+        "url":"https://github.com/wolfeidau/netif/issues"
+    },
+    "licenses":[
+        {
+            "type":"MIT",
+            "url":"https://github.com/wolfeidau/netif/blob/master/LICENSE-MIT"
+        }
+    ],
+    "main":"lib/netif",
+    "engines":{
+        "node":">= 0.6.0"
+    },
+    "scripts":{
+        "test":"grunt test",
+        "install": "node-gyp rebuild"
+    },
+    "devDependencies":{
+        "grunt":"~0.3.17"
+    },
+    "keywords":[],
+    "gypfile": true
+}

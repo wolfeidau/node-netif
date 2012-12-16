@@ -1,0 +1,10 @@
+{
+    "targets":[
+        {
+            "target_name":"netif",
+            "sources":[
+                "src/netif.cc"
+            ]
+        }
+    ]
+}
