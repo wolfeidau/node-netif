@@ -5,7 +5,6 @@
 #ifdef __APPLE__
 #include <net/if.h>
 #include <net/if_dl.h>
-#include <net/ethernet.h>
 #endif 
 
 #ifdef __linux__
@@ -13,6 +12,8 @@
 #include <linux/if.h>
 #include <netdb.h>
 #endif 
+
+#include <net/ethernet.h>
 
 #include <string.h>
 
@@ -26,14 +27,13 @@ int main( int argc, const char* argv[] )
     exit(1);
   }
 
-#ifdef __APPLE__
   char *messageBuffer = NULL;
-
   const char *interface = argv[1];
+  unsigned char       macAddress[ETHER_ADDR_LEN];
 
+#ifdef __APPLE__
   int mgmtInfoBase[ETHER_ADDR_LEN];
   size_t              length;
-  unsigned char       macAddress[ETHER_ADDR_LEN];
   struct if_msghdr    *interfaceMsgStruct;
   struct sockaddr_dl  *socketStruct;
 
@@ -70,7 +70,6 @@ int main( int argc, const char* argv[] )
     }
   }
 
-  printf( "\nPrinting mac addresse for %s\n\n", interface);
 
   // Map msgbuffer to interface message structure
   interfaceMsgStruct = (struct if_msghdr *) messageBuffer;
@@ -90,11 +89,21 @@ int main( int argc, const char* argv[] )
 
   // copy in the ethernet interface name
   strcpy(s.ifr_name, interface);
+  
+  if (0 == ioctl(fd, SIOCGIFHWADDR, &s)) {
 
-  // Copy link layer address data in a socket structure to an array
-  memcpy(&macAddress, &s.ifr_addr.sa_data, ETHER_ADDR_LEN);
+    // Copy link layer address data in a socket structure to an array
+    memcpy(&macAddress, &s.ifr_addr.sa_data, ETHER_ADDR_LEN);
+
+  } else {
+    printf("error opening interface\n");
+    exit(1);
+  }
 
 #endif
+
+  printf( "\nPrinting mac addresse for %s\n\n", interface);
+
 
   printf("%02X:%02X:%02X:%02X:%02X:%02X\n", 
       macAddress[0], macAddress[1], macAddress[2], 

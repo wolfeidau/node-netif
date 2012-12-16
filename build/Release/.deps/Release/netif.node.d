@@ -1,1 +1,0 @@
-cmd_Release/netif.node := ./gyp-mac-tool flock ./Release/linker.lock c++ -shared -Wl,-search_paths_first -mmacosx-version-min=10.5 -arch x86_64 -L./Release -install_name @loader_path/netif.node  -o Release/netif.node Release/obj.target/netif/src/netif.o -undefined dynamic_lookup
