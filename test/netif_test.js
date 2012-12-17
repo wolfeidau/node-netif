@@ -1,4 +1,4 @@
-var netif = require('../lib/netif.js');
+var netif = require('./build/Debug/netif.node');
 
 exports['awesome'] = {
   setUp: function(done) {

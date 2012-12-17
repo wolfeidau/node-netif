@@ -1,15 +1,18 @@
 #include <sys/socket.h>
 #include <sys/types.h>
+
+
+#if defined(__APPLE_CC__) || defined(__APPLE__)
 #include <sys/sysctl.h>
 
 #undef EV_ERROR
 
-#if defined(__APPLE_CC__) || defined(__APPLE__)
 #include <net/if.h>
 #include <net/if_dl.h>
 #endif
 
 #if defined(linux)
+#include <sys/sysctl.h>
 #include <sys/ioctl.h>
 #include <linux/if.h>
 #include <netdb.h>
@@ -122,8 +125,12 @@ Handle<Value> GetIFMacAddress(const Arguments& args) {
   }
 
 #endif
-    char       formattedMacAddress[17];
-//  char * formattedMacAddress = NULL;
+
+#ifdef SOLARIS
+
+#endif
+
+  char       formattedMacAddress[17];
 
   sprintf(formattedMacAddress, "%02X:%02X:%02X:%02X:%02X:%02X",
       macAddress[0], macAddress[1], macAddress[2],
