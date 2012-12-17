@@ -1,13 +1,17 @@
 # netif
 
-Node wrapper for net/if.h
+Node library which uses native calls to locate the mac address for
+a given interface name.
+
+Currently works on OSX and Linux, working on support for Solaris /
+SmartOS and windows at the moment.
 
 ## Getting Started
 Install the module with: `npm install netif`
 
 ```javascript
 var netif = require('netif');
-netif.awesome(); // "awesome"
+netif.getIFMacAddress('eth0'); // '00:0C:00:00:00:00'
 ```
 
 ## Documentation
