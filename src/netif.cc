@@ -13,6 +13,7 @@
 #include <sys/ioctl.h>
 #include <linux/if.h>
 #include <netdb.h>
+#include <stdlib.h>
 #endif
 
 #include <net/ethernet.h>
