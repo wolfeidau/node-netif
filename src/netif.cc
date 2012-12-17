@@ -24,7 +24,6 @@
 #include <node.h>
 
 using namespace v8;
-//using namespace node;
 
 
 Handle<Value> GetIFMacAddress(const Arguments& args) {
