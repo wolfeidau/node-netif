@@ -1,27 +1,18 @@
-/*
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <sys/sysctl.h>
 
+#undef EV_ERROR
+
+#if defined(__APPLE_CC__) || defined(__APPLE__)
+#include <net/if.h>
+#include <net/if_dl.h>
+#endif
 
 #if defined(linux)
 #include <sys/ioctl.h>
 #include <linux/if.h>
 #include <netdb.h>
-#endif
-
-
-#include <string.h>
-
-#include <stdlib.h>
-#include <stdio.h>
-*/
-#include <sys/socket.h>
-
-#include <sys/types.h>
-#include <sys/sysctl.h>
-
-
-#if defined(__APPLE_CC__) || defined(__APPLE__)
-#include <net/if.h>
-#include <net/if_dl.h>
 #endif
 
 #include <net/ethernet.h>
@@ -130,15 +121,18 @@ Handle<Value> GetIFMacAddress(const Arguments& args) {
   }
 
 #endif
+    char       formattedMacAddress[17];
+//  char * formattedMacAddress = NULL;
 
-  printf("%02X:%02X:%02X:%02X:%02X:%02X\n",
+  sprintf(formattedMacAddress, "%02X:%02X:%02X:%02X:%02X:%02X",
       macAddress[0], macAddress[1], macAddress[2],
       macAddress[3], macAddress[4], macAddress[5]);
 
   // Release the buffer memory
   free(messageBuffer);
 
-  return scope.Close(Undefined());
+  // Copy mac address to a v8 string
+  return scope.Close(String::New(formattedMacAddress));
 }
 
 void Init(Handle<Object> target) {
