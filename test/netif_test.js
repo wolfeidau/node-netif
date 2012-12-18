@@ -1,4 +1,4 @@
-var netif = require('./build/Debug/netif.node');
+var netif = require('../build/Debug/netif.node');
 
 exports['awesome'] = {
   setUp: function(done) {
@@ -8,7 +8,7 @@ exports['awesome'] = {
   'no args': function(test) {
     test.expect(1);
     // tests here
-    test.equal(netif.awesome(), 'awesome', 'should be awesome.');
+    test.ok(netif.getIFMacAddress('eth0'), "should not error out");
     test.done();
   }
 };
