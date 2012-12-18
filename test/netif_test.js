@@ -1,4 +1,4 @@
-var netif = require('../build/Debug/netif.node');
+var  netif = require('../build/Release/netif.node'); // require('netif');
 
 exports['awesome'] = {
   setUp: function(done) {
