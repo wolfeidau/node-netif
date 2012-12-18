@@ -25,7 +25,8 @@
         "node":">= 0.6.0"
     },
     "scripts":{
-        "install": "node-gyp rebuild"
+        "install": "make build",
+        "test": "make test"
     },
     "devDependencies":{
         "nodeunit":"*"
