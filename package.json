@@ -25,11 +25,10 @@
         "node":">= 0.6.0"
     },
     "scripts":{
-        "test":"grunt test",
         "install": "node-gyp rebuild"
     },
     "devDependencies":{
-        "grunt":"~0.3.17"
+        "nodeunit":"*"
     },
     "keywords":[],
     "gypfile": true
