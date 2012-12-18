@@ -1,10 +1,9 @@
 var netif = require('../build/Debug/netif');
 
+var i = 0;
 
-for (var i = 0; i < Number.MAX_VALUE; i++){
-  process.nextTick(foo);
-}
-
-function foo() {
+for (; i < 1000000; i++) {
   netif.getIFMacAddress('en1');
 }
+
+console.log("ran " + i + " times.");
