@@ -1,15 +1,16 @@
-var  netif = require('../build/Release/netif.node'); // require('netif');
+var  netif = require('../build/Debug/netif.node'); // require('netif');
 
-exports['awesome'] = {
+exports['netif'] = {
   setUp: function(done) {
     // setup here
     done();
   },
-  'no args': function(test) {
+  'should look up interface given an ethernet interface name': function(test) {
     test.expect(1);
     // tests here
-    //test.ok(netif.getIFMacAddress('eth0'), "should not error out");
-    test.ok(netif.getIFMacAddress('net0'), "should not error out");
+    //test.ok(netif.getMacAddress('eth0'), "should not error out"); // linux
+    //test.ok(netif.getMacAddress('net0'), "should not error out"); // solaris
+    test.ok(netif.getMacAddress('en0'), "should not error out"); // osx
     test.done();
   }
 };

@@ -19,6 +19,7 @@
 #include <netdb.h>
 #include <stdlib.h>
 #include <net/ethernet.h>
+#include <unistd.h>
 #endif
 
 #if defined(__sun)
@@ -35,7 +36,7 @@
 using namespace v8;
 
 
-Handle<Value> GetIFMacAddress(const Arguments& args) {
+Handle<Value> GetMacAddress(const Arguments& args) {
 
   HandleScope scope;
 
@@ -71,7 +72,7 @@ Handle<Value> GetIFMacAddress(const Arguments& args) {
   // With all configured interfaces requested, get handle index
   if ((mgmtInfoBase[5] = if_nametoindex((char *) *device)) == 0) {
 
-    ThrowException(Exception::TypeError(String::New("if_nametoindex failure")));
+    ThrowException(Exception::TypeError(String::New("Error opening interface")));
     return scope.Close(Undefined());
 
   } else {
@@ -128,7 +129,9 @@ Handle<Value> GetIFMacAddress(const Arguments& args) {
     memcpy(&macAddress, &s.ifr_addr.sa_data, ETHER_ADDR_LEN);
 
   } else {
-    ThrowException(Exception::TypeError(String::New("error opening interface")));
+
+    // TODO lookup the ERR for this and return it to the user for example -1 EMFILE (Too many open files)
+    ThrowException(Exception::TypeError(String::New("Error opening interface")));
     return scope.Close(Undefined());
   }
 
@@ -151,6 +154,8 @@ Handle<Value> GetIFMacAddress(const Arguments& args) {
     memcpy(&macAddress, &s.ifr_addr.sa_data, ETHER_ADDR_LEN);
 
   } else {
+
+    // TODO lookup the ERR for this and return it to the user for example -1 EMFILE (Too many open files)
     ThrowException(Exception::TypeError(String::New("error opening interface")));
     return scope.Close(Undefined());
   }
@@ -174,8 +179,8 @@ Handle<Value> GetIFMacAddress(const Arguments& args) {
 }
 
 void Init(Handle<Object> target) {
-  target->Set(String::NewSymbol("getIFMacAddress"),
-      FunctionTemplate::New(GetIFMacAddress)->GetFunction());
+  target->Set(String::NewSymbol("getMacAddress"),
+      FunctionTemplate::New(GetMacAddress)->GetFunction());
 }
 
 NODE_MODULE(netif, Init)
