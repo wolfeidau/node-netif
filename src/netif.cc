@@ -132,6 +132,9 @@ Handle<Value> GetIFMacAddress(const Arguments& args) {
     return scope.Close(Undefined());
   }
 
+  // Close the file descriptor
+  close(fd);
+
 #endif
 
 #if defined(__sun)
@@ -152,6 +155,8 @@ Handle<Value> GetIFMacAddress(const Arguments& args) {
     return scope.Close(Undefined());
   }
 
+  // Close the file descriptor
+  close(fd);
 
 #endif
 

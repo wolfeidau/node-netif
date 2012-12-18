@@ -108,6 +108,9 @@ int main( int argc, const char* argv[] )
       macAddress[0], macAddress[1], macAddress[2], 
       macAddress[3], macAddress[4], macAddress[5]);
 
+  // close the file descriptor
+  close(sock);
+
   // Release the buffer memory
   free(messageBuffer);
 }
