@@ -54,9 +54,9 @@ Handle<Value> GetMacAddress(const Arguments& args) {
 
   v8::String::AsciiValue device(args[0]);
   char formattedMacAddress[MAC_ADDR_LENGTH];
+  unsigned char macAddress[ETHER_ADDR_LEN];
 
 #if defined(__APPLE_CC__) || defined(__APPLE__)
-  unsigned char       macAddress[ETHER_ADDR_LEN];
   char *messageBuffer = NULL;
   int mgmtInfoBase[ETHER_ADDR_LEN];
   size_t              length;
@@ -126,7 +126,6 @@ Handle<Value> GetMacAddress(const Arguments& args) {
 #if defined(linux)
 
   struct ifreq s;
-  const char *mac;
 
   int fd = socket(PF_INET, SOCK_DGRAM, IPPROTO_IP);
 
@@ -135,12 +134,12 @@ Handle<Value> GetMacAddress(const Arguments& args) {
 
   if (0 == ioctl(fd, SIOCGIFHWADDR, &s)) {
 
-    // Copy link layer address data
-    mac = (const char *)&s.ifr_addr.sa_data;
+    // Copy link layer address data in socket structure to an array
+    memcpy(&macAddress, &s.ifr_addr.sa_data, ETHER_ADDR_LEN);
 
     snprintf(formattedMacAddress, MAC_ADDR_LENGTH, "%02X:%02X:%02X:%02X:%02X:%02X",
-        mac[0], mac[1], mac[2],
-        mac[3], mac[4], mac[5]);
+        macAddress[0], macAddress[1], macAddress[2],
+        macAddress[3], macAddress[4], macAddress[5]);
 
   } else {
 
@@ -157,7 +156,6 @@ Handle<Value> GetMacAddress(const Arguments& args) {
 #if defined(__sun)
 
   struct ifreq s;
-  unsigned char macAddress[ETHER_ADDR_LEN];
 
   int fd = socket(PF_INET, SOCK_DGRAM, IPPROTO_IP);
 
