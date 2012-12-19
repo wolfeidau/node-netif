@@ -138,7 +138,7 @@ Handle<Value> GetMacAddress(const Arguments& args) {
     // Copy link layer address data
     mac = (const char *)&s.ifr_addr.sa_data;
 
-    sprintf(formattedMacAddress, "%02X:%02X:%02X:%02X:%02X:%02X",
+    snprintf(formattedMacAddress, MAC_ADDR_LENGTH, "%02X:%02X:%02X:%02X:%02X:%02X",
         mac[0], mac[1], mac[2],
         mac[3], mac[4], mac[5]);
 
