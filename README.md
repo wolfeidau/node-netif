@@ -3,8 +3,9 @@
 Node library which uses native calls to locate the mac address for
 a given interface name.
 
-Currently works on OSX and Linux, working on support for Solaris /
-SmartOS and windows at the moment.
+Currently works on OSX, Solaris and Linux, working on support windows at the moment.
+
+-[![Build Status](https://secure.travis-ci.org/wolfeidau/node-netif.png)](http://travis-ci.org/wolfeidau/node-netif)
 
 ## Getting Started
 Install the module with: `npm install netif`
