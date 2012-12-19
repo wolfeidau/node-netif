@@ -31,6 +31,8 @@
 #define	ETHER_ADDR_LEN		6
 #endif
 
+#define	MAC_ADDR_LENGTH		17
+
 #include <node.h>
 
 using namespace v8;
@@ -51,7 +53,7 @@ Handle<Value> GetMacAddress(const Arguments& args) {
   }
 
   v8::String::AsciiValue device(args[0]);
-  char formattedMacAddress[17];
+  char formattedMacAddress[MAC_ADDR_LENGTH];
 
 #if defined(__APPLE_CC__) || defined(__APPLE__)
   unsigned char       macAddress[ETHER_ADDR_LEN];
@@ -115,7 +117,7 @@ Handle<Value> GetMacAddress(const Arguments& args) {
   // Release the buffer memory
   free(messageBuffer);
 
-  snprintf(formattedMacAddress, 14, "%02X:%02X:%02X:%02X:%02X:%02X",
+  snprintf(formattedMacAddress, MAC_ADDR_LENGTH + 1, "%02X:%02X:%02X:%02X:%02X:%02X",
       macAddress[0], macAddress[1], macAddress[2],
       macAddress[3], macAddress[4], macAddress[5]);
 
@@ -136,7 +138,7 @@ Handle<Value> GetMacAddress(const Arguments& args) {
     // Copy link layer address data
     mac = (const char *)&s.ifr_addr.sa_data;
 
-    snprintf(formattedMacAddress, 14, "%02X:%02X:%02X:%02X:%02X:%02X",
+    snprintf(formattedMacAddress, MAC_ADDR_LENGTH _ 1, "%02X:%02X:%02X:%02X:%02X:%02X",
         mac[0], mac[1], mac[2],
         mac[3], mac[4], mac[5]);
 
@@ -165,7 +167,7 @@ Handle<Value> GetMacAddress(const Arguments& args) {
     // Copy link layer address data
     mac = (const char *)&s.ifr_addr.sa_data;
 
-    snprintf(formattedMacAddress, 14, "%02X:%02X:%02X:%02X:%02X:%02X",
+    snprintf(formattedMacAddress, MAC_ADDR_LENGTH + 1, "%02X:%02X:%02X:%02X:%02X:%02X",
         mac[0], mac[1], mac[2],
         mac[3], mac[4], mac[5]);
 
