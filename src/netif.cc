@@ -52,11 +52,11 @@ Handle<Value> GetMacAddress(const Arguments& args) {
 
   String::Utf8Value device(args[0]->ToString());
 
-  char *messageBuffer = NULL;
   //const char *interface = (char *) *device;
   unsigned char       macAddress[ETHER_ADDR_LEN];
 
 #if defined(__APPLE_CC__) || defined(__APPLE__)
+  char *messageBuffer = NULL;
   int mgmtInfoBase[ETHER_ADDR_LEN];
   size_t              length;
   struct if_msghdr    *interfaceMsgStruct;
@@ -112,6 +112,9 @@ Handle<Value> GetMacAddress(const Arguments& args) {
 
   // Copy link layer address data in socket structure to an array
   memcpy(&macAddress, socketStruct->sdl_data + socketStruct->sdl_nlen, ETHER_ADDR_LEN);
+
+  // Release the buffer memory
+  free(messageBuffer);
 
 #endif
 
@@ -170,9 +173,6 @@ Handle<Value> GetMacAddress(const Arguments& args) {
   sprintf(formattedMacAddress, "%02X:%02X:%02X:%02X:%02X:%02X",
       macAddress[0], macAddress[1], macAddress[2],
       macAddress[3], macAddress[4], macAddress[5]);
-
-  // Release the buffer memory
-  free(messageBuffer);
 
   // Copy mac address to a v8 string
   return scope.Close(String::New(formattedMacAddress));
