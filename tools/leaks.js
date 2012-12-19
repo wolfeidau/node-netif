@@ -1,4 +1,4 @@
-var netif = require('../build/Debug/netif');
+var netif = require('netif');
 
 var i = 0;
 
