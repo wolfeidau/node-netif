@@ -1,9 +1,9 @@
-var netif = require('netif');
+var netif = require('../build/Release/netif');
 
 var i = 0;
 
-for (; i < 1000000; i++) {
-  netif.getMacAddress('en1');
+for (; i < 100; i++) {
+  netif.getMacAddress('eth0');
 }
 
 console.log("ran " + i + " times.");

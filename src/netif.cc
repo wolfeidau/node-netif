@@ -50,12 +50,11 @@ Handle<Value> GetMacAddress(const Arguments& args) {
     return scope.Close(Undefined());
   }
 
-  String::Utf8Value device(args[0]->ToString());
-
-  //const char *interface = (char *) *device;
-  unsigned char       macAddress[ETHER_ADDR_LEN];
+  v8::String::AsciiValue device(args[0]);
+  char formattedMacAddress[17];
 
 #if defined(__APPLE_CC__) || defined(__APPLE__)
+  unsigned char       macAddress[ETHER_ADDR_LEN];
   char *messageBuffer = NULL;
   int mgmtInfoBase[ETHER_ADDR_LEN];
   size_t              length;
@@ -116,20 +115,30 @@ Handle<Value> GetMacAddress(const Arguments& args) {
   // Release the buffer memory
   free(messageBuffer);
 
+  snprintf(formattedMacAddress, 14, "%02X:%02X:%02X:%02X:%02X:%02X",
+      macAddress[0], macAddress[1], macAddress[2],
+      macAddress[3], macAddress[4], macAddress[5]);
+
 #endif
 
 #if defined(linux)
 
   struct ifreq s;
+  const char *mac;
+
   int fd = socket(PF_INET, SOCK_DGRAM, IPPROTO_IP);
 
   // copy in the ethernet interface name
-  strcpy(s.ifr_name, (char *) *device);
+  strncpy(s.ifr_name, *device, IFNAMSIZ);
 
   if (0 == ioctl(fd, SIOCGIFHWADDR, &s)) {
 
-    // Copy link layer address data in a socket structure to an array
-    memcpy(&macAddress, &s.ifr_addr.sa_data, ETHER_ADDR_LEN);
+    // Copy link layer address data
+    mac = (const char *)&s.ifr_addr.sa_data;
+
+    snprintf(formattedMacAddress, 14, "%02X:%02X:%02X:%02X:%02X:%02X",
+        mac[0], mac[1], mac[2],
+        mac[3], mac[4], mac[5]);
 
   } else {
 
@@ -149,12 +158,16 @@ Handle<Value> GetMacAddress(const Arguments& args) {
   int fd = socket(PF_INET, SOCK_DGRAM, IPPROTO_IP);
 
   // copy in the ethernet interface name
-  strcpy(s.ifr_name, (char *) *device);
+  strncpy(s.ifr_name, *device, IFNAMSIZ);
 
   if (0 == ioctl(fd, SIOCGIFHWADDR, &s)) {
 
-    // Copy link layer address data in a socket structure to an array
-    memcpy(&macAddress, &s.ifr_addr.sa_data, ETHER_ADDR_LEN);
+    // Copy link layer address data
+    mac = (const char *)&s.ifr_addr.sa_data;
+
+    snprintf(formattedMacAddress, 14, "%02X:%02X:%02X:%02X:%02X:%02X",
+        mac[0], mac[1], mac[2],
+        mac[3], mac[4], mac[5]);
 
   } else {
 
@@ -167,12 +180,6 @@ Handle<Value> GetMacAddress(const Arguments& args) {
   close(fd);
 
 #endif
-
-  char       formattedMacAddress[17];
-
-  sprintf(formattedMacAddress, "%02X:%02X:%02X:%02X:%02X:%02X",
-      macAddress[0], macAddress[1], macAddress[2],
-      macAddress[3], macAddress[4], macAddress[5]);
 
   // Copy mac address to a v8 string
   return scope.Close(String::New(formattedMacAddress));
