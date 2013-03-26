@@ -1,16 +1,16 @@
-var netif = require('../lib/netif');
+var netif = require('bindings')('netif');
 
 var os = require('os');
 
 exports['netif'] = {
-  setUp: function(done) {
+  setUp: function (done) {
     // setup here
     done();
   },
-  'should look up interface given an ethernet interface name': function(test) {
+  'should look up interface given an ethernet interface name': function (test) {
     test.expect(1);
     // tests here
-    switch(os.platform()) {
+    switch (os.platform()) {
       case 'darwin':
         test.ok(netif.getMacAddress('en0'), "should not error out"); // osx
         break;
@@ -24,7 +24,5 @@ exports['netif'] = {
         throw Error('unsupported os for this module.');
     }
     test.done();
-    //test.ok(netif.getMacAddress('net0'), "should not error out"); // solaris
-    //test.ok(netif.getMacAddress('en0'), "should not error out"); // osx
   }
 };

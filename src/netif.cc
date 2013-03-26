@@ -28,15 +28,13 @@
 #include <net/if.h>
 #include <unistd.h>
 #include <stropts.h>
-#define	ETHER_ADDR_LEN		6
 #endif
-
-#define	MAC_ADDR_LENGTH		18
 
 #include <node.h>
 
-using namespace v8;
+#include "netif.h"
 
+using namespace v8;
 
 Handle<Value> GetMacAddress(const Arguments& args) {
 
@@ -53,12 +51,12 @@ Handle<Value> GetMacAddress(const Arguments& args) {
   }
 
   v8::String::AsciiValue device(args[0]);
-  char formattedMacAddress[MAC_ADDR_LENGTH];
-  unsigned char macAddress[ETHER_ADDR_LEN];
+  char formattedMacAddress[mac_addr_len];
+  unsigned char macAddress[ether_addr_len];
 
 #if defined(__APPLE_CC__) || defined(__APPLE__)
   char *messageBuffer = NULL;
-  int mgmtInfoBase[ETHER_ADDR_LEN];
+  int mgmtInfoBase[ether_addr_len];
   size_t              length;
   struct if_msghdr    *interfaceMsgStruct;
   struct sockaddr_dl  *socketStruct;
@@ -79,7 +77,7 @@ Handle<Value> GetMacAddress(const Arguments& args) {
   } else {
 
     // Get the size of the data available (store in len)
-    if (sysctl(mgmtInfoBase, ETHER_ADDR_LEN, NULL, &length, NULL, 0) < 0) {
+    if (sysctl(mgmtInfoBase, ether_addr_len, NULL, &length, NULL, 0) < 0) {
 
       ThrowException(Exception::TypeError(String::New("sysctl mgmtInfoBase failure")));
       return scope.Close(Undefined());
@@ -93,7 +91,7 @@ Handle<Value> GetMacAddress(const Arguments& args) {
       } else {
 
         // Get system information, store in buffer
-        if (sysctl(mgmtInfoBase, ETHER_ADDR_LEN, messageBuffer, &length, NULL, 0) < 0){
+        if (sysctl(mgmtInfoBase, ether_addr_len, messageBuffer, &length, NULL, 0) < 0){
 
           // Release the buffer memory
           free(messageBuffer);
@@ -112,12 +110,12 @@ Handle<Value> GetMacAddress(const Arguments& args) {
   socketStruct = (struct sockaddr_dl *) (interfaceMsgStruct + 1);
 
   // Copy link layer address data in socket structure to an array
-  memcpy(&macAddress, socketStruct->sdl_data + socketStruct->sdl_nlen, ETHER_ADDR_LEN);
+  memcpy(&macAddress, socketStruct->sdl_data + socketStruct->sdl_nlen, ether_addr_len);
 
   // Release the buffer memory
   free(messageBuffer);
 
-  snprintf(formattedMacAddress, MAC_ADDR_LENGTH, "%02X:%02X:%02X:%02X:%02X:%02X",
+  snprintf(formattedMacAddress, mac_addr_len, "%02X:%02X:%02X:%02X:%02X:%02X",
       macAddress[0], macAddress[1], macAddress[2],
       macAddress[3], macAddress[4], macAddress[5]);
 
@@ -135,9 +133,9 @@ Handle<Value> GetMacAddress(const Arguments& args) {
   if (0 == ioctl(fd, SIOCGIFHWADDR, &s)) {
 
     // Copy link layer address data in socket structure to an array
-    memcpy(&macAddress, &s.ifr_addr.sa_data, ETHER_ADDR_LEN);
+    memcpy(&macAddress, &s.ifr_addr.sa_data, ether_addr_len);
 
-    snprintf(formattedMacAddress, MAC_ADDR_LENGTH, "%02X:%02X:%02X:%02X:%02X:%02X",
+    snprintf(formattedMacAddress, mac_addr_len, "%02X:%02X:%02X:%02X:%02X:%02X",
         macAddress[0], macAddress[1], macAddress[2],
         macAddress[3], macAddress[4], macAddress[5]);
 
@@ -165,9 +163,9 @@ Handle<Value> GetMacAddress(const Arguments& args) {
   if (0 == ioctl(fd, SIOCGIFHWADDR, &s)) {
 
     // Copy link layer address data in socket structure to an array
-    memcpy(&macAddress, &s.ifr_addr.sa_data, ETHER_ADDR_LEN);
+    memcpy(&macAddress, &s.ifr_addr.sa_data, ether_addr_len);
 
-    snprintf(formattedMacAddress, MAC_ADDR_LENGTH, "%02X:%02X:%02X:%02X:%02X:%02X",
+    snprintf(formattedMacAddress, mac_addr_len, "%02X:%02X:%02X:%02X:%02X:%02X",
         macAddress[0], macAddress[1], macAddress[2],
         macAddress[3], macAddress[4], macAddress[5]);
 
