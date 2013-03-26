@@ -1,7 +1,7 @@
 {
     "name":"netif",
     "description":"Node wrapper for net/if.h",
-    "version":"0.1.4",
+    "version":"0.1.5",
     "homepage":"https://github.com/wolfeidau/node-netif",
     "author":{
         "name":"Mark Wolfe",
@@ -34,6 +34,6 @@
     "devDependencies":{
         "nodeunit":"*"
     },
-    "keywords":[],
+    "keywords":['ifconfig', 'mac', 'address'],
     "gypfile": true
 }
