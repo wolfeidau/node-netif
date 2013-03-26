@@ -34,6 +34,6 @@
     "devDependencies":{
         "nodeunit":"*"
     },
-    "keywords":['ifconfig', 'mac', 'address'],
+    "keywords": ["ifconfig", "mac", "address"],
     "gypfile": true
 }
