@@ -17,7 +17,7 @@ exports['netif'] = {
       case 'linux':
         test.ok(netif.getMacAddress('eth0'), "should not error out"); // linux
         break;
-      case 'solaris':
+      case 'sunos':
         test.ok(netif.getMacAddress('net0'), "should not error out"); // solaris
         break;
       default:
