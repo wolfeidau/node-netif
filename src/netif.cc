@@ -31,6 +31,7 @@
 #endif
 
 #include <node.h>
+#include <string.h>
 
 #include "netif.h"
 
