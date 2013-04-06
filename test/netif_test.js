@@ -15,7 +15,10 @@ exports['netif'] = {
         test.ok(netif.getMacAddress('en0'), "should not error out"); // osx
         break;
       case 'linux':
-        test.ok(netif.getMacAddress('eth0'), "should not error out"); // linux
+        if (process.env.TRAVIS) // cause travis is different..
+            test.ok(netif.getMacAddress('venet0'), "should not error out"); // linux
+	else
+            test.ok(netif.getMacAddress('eth0'), "should not error out"); // linux
         break;
       case 'sunos':
         test.ok(netif.getMacAddress('net0'), "should not error out"); // solaris
