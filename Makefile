@@ -16,7 +16,7 @@ test: build list
 					$(TESTS)
 
 list:
-		ifconfig -a
+		/sbin/ifconfig -a
 
 clean:
 		node-gyp clean
