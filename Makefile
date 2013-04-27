@@ -11,12 +11,9 @@ compile: configure
 		node-gyp build
 			npm install .
 
-test: build list
+test: build
 		@./node_modules/nodeunit/bin/nodeunit \
 					$(TESTS)
-
-list:
-		/sbin/ifconfig -a
 
 clean:
 		node-gyp clean
