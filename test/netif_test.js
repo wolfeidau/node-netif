@@ -22,5 +22,18 @@ exports['netif'] = {
       test.ok(/([0-9a-f]{2}:){5}[0-9a-f]{2}/i.test(mac), "should return a MAC address for " + name);
     });
     test.done();
+  },
+  'should look up the first non-loopback interface if no name was given': function (test) {
+    test.expect(3);
+
+    var mac = netif.getMacAddress();
+    test.ok(mac, "should return *something*");
+    test.ok(/([0-9a-f]{2}:){5}[0-9a-f]{2}/i.test(mac), "should return a MAC address");
+
+    test.ok(interfaceNames.filter(function (name) {
+      return (interfaces[name].length > 0) && !(interfaces[name][0].internal);
+    }).map(netif.getMacAddress).indexOf(mac) >= 0);
+
+    test.done();
   }
 };
