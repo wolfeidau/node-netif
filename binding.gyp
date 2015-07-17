@@ -7,6 +7,16 @@
             ],
             "include_dirs":[
                 "<!(node -e \"require('nan')\")"
+            ],
+            "conditions":[
+                [
+                    "OS=='win'",
+                    {
+                        "link_settings":{
+                            "libraries":["iphlpapi.lib"]
+                        }
+                    }
+                ]
             ]
         },
         {

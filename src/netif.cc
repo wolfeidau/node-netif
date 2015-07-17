@@ -1,5 +1,7 @@
+#if !defined(_WIN32)
 #include <sys/socket.h>
 #include <sys/types.h>
+#endif
 
 
 #if defined(__APPLE_CC__) || defined(__APPLE__)
@@ -28,6 +30,12 @@
 #include <net/if.h>
 #include <unistd.h>
 #include <stropts.h>
+#endif
+
+#if defined(_WIN32)
+#include <winsock2.h>
+#include <iphlpapi.h>
+#include <stdlib.h>
 #endif
 
 #include <node.h>
@@ -177,6 +185,47 @@ NAN_METHOD(GetMacAddress) {
 
   // Close the file descriptor
   close(fd);
+
+#endif
+
+#if defined(_WIN32)
+
+  IP_ADAPTER_ADDRESSES adapterAddresses[16], *adapterAddress;
+  ULONG size = sizeof(adapterAddresses);
+  ULONG flags = GAA_FLAG_SKIP_UNICAST | GAA_FLAG_SKIP_ANYCAST | GAA_FLAG_SKIP_MULTICAST;
+
+  if (ERROR_SUCCESS == GetAdaptersAddresses(AF_UNSPEC, flags, NULL, &(adapterAddresses[0]), &size)) {
+    adapterAddress = &adapterAddresses[0];
+
+    while (NULL != adapterAddress) {
+      if (0 != strcmp(adapterAddress->AdapterName, *device)) {
+        break;
+      }
+      adapterAddress = adapterAddress->Next;
+    }
+
+    if (NULL == adapterAddress) {
+      NanThrowTypeError("unknown interface");
+      NanReturnUndefined();
+    }
+    if (adapterAddress->PhysicalAddressLength != ether_addr_len) {
+      NanThrowTypeError("address length mismatch");
+      NanReturnUndefined();
+    }
+
+    // Copy link layer address data in socket structure to an array
+    memcpy(&macAddress, adapterAddress->PhysicalAddress, ether_addr_len);
+
+    sprintf(formattedMacAddress, "%02X:%02X:%02X:%02X:%02X:%02X",
+        macAddress[0], macAddress[1], macAddress[2],
+        macAddress[3], macAddress[4], macAddress[5]);
+
+  } else {
+
+    // TODO lookup the ERR for this and return it to the user
+    NanThrowTypeError("error obtaining adapter addresses");
+    NanReturnUndefined();
+  }
 
 #endif
 
