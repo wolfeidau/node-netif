@@ -44,7 +44,7 @@
     "node-pre-gyp"
   ],
   "devDependencies": {
-    "nodeunit": "*"
+    "nodeunit": "~0.8.8"
   },
   "keywords": [
     "ifconfig",
