@@ -1,5 +1,6 @@
+/node_modules
+/build
+/lib/binding
 .idea
-node_modules
-build
 npm-debug.log
 .DS_Store

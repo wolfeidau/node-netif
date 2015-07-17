@@ -1,3 +1,4 @@
+sudo: false
 language: node_js
 node_js:
   - "0.10"
@@ -6,3 +7,7 @@ node_js:
 env:
     global:
      - TRAVIS=true
+install:
+  - npm install --build-from-source
+  - npm run-script package
+  - ls build/stage/${TRAVIS_REPO_SLUG}/releases/download/${TRAVIS_TAG}/*.tar.gz

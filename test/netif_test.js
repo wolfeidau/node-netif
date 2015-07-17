@@ -1,4 +1,4 @@
-var netif = require('bindings')('netif');
+var netif = require('../lib/netif');
 
 var os = require('os');
 
