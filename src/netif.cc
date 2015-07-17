@@ -31,27 +31,25 @@
 #endif
 
 #include <node.h>
+#include <nan.h>
 #include <string.h>
 
 #include "netif.h"
 
 using namespace v8;
 
-Handle<Value> GetMacAddress(const Arguments& args) {
-
-  HandleScope scope;
+NAN_METHOD(GetMacAddress) {
+  NanScope();
 
   if (args.Length() < 1) {
-    ThrowException(Exception::TypeError(String::New("Wrong number of arguments")));
-    return scope.Close(Undefined());
+    NanThrowTypeError("Wrong number of arguments");
   }
 
   if (!args[0]->IsString()) {
-    ThrowException(Exception::TypeError(String::New("Wrong arguments")));
-    return scope.Close(Undefined());
+    NanThrowTypeError("First argument must be a string");
   }
 
-  v8::String::AsciiValue device(args[0]);
+  NanUtf8String device(args[0]);
   char formattedMacAddress[mac_addr_len];
   unsigned char macAddress[ether_addr_len];
 
@@ -72,23 +70,23 @@ Handle<Value> GetMacAddress(const Arguments& args) {
   // With all configured interfaces requested, get handle index
   if ((mgmtInfoBase[5] = if_nametoindex((char *) *device)) == 0) {
 
-    ThrowException(Exception::TypeError(String::New("Error opening interface")));
-    return scope.Close(Undefined());
+    NanThrowTypeError("Error opening interface");
+    NanReturnUndefined();
 
   } else {
 
     // Get the size of the data available (store in len)
     if (sysctl(mgmtInfoBase, ether_addr_len, NULL, &length, NULL, 0) < 0) {
 
-      ThrowException(Exception::TypeError(String::New("sysctl mgmtInfoBase failure")));
-      return scope.Close(Undefined());
+      NanThrowTypeError("sysctl mgmtInfoBase failure");
+      NanReturnUndefined();
     } else {
 
       // Alloc memory based on above call
       if ((messageBuffer= (char *)malloc(length)) == NULL) {
 
-        ThrowException(Exception::TypeError(String::New("message buffer allocation failure")));
-        return scope.Close(Undefined());
+        NanThrowTypeError("message buffer allocation failure");
+        NanReturnUndefined();
       } else {
 
         // Get system information, store in buffer
@@ -97,8 +95,8 @@ Handle<Value> GetMacAddress(const Arguments& args) {
           // Release the buffer memory
           free(messageBuffer);
 
-          ThrowException(Exception::TypeError(String::New("sysctl msgBuffer failure")));
-          return scope.Close(Undefined());
+          NanThrowTypeError("sysctl msgBuffer failure");
+          NanReturnUndefined();
         }
       }
     }
@@ -143,8 +141,8 @@ Handle<Value> GetMacAddress(const Arguments& args) {
   } else {
 
     // TODO lookup the ERR for this and return it to the user for example -1 EMFILE (Too many open files)
-    ThrowException(Exception::TypeError(String::New("Error opening interface")));
-    return scope.Close(Undefined());
+    NanThrowTypeError("Error opening interface");
+    NanReturnUndefined();
   }
 
   // Close the file descriptor
@@ -173,8 +171,8 @@ Handle<Value> GetMacAddress(const Arguments& args) {
   } else {
 
     // TODO lookup the ERR for this and return it to the user for example -1 EMFILE (Too many open files)
-    ThrowException(Exception::TypeError(String::New("error opening interface")));
-    return scope.Close(Undefined());
+    NanThrowTypeError("error opening interface");
+    NanReturnUndefined();
   }
 
   // Close the file descriptor
@@ -183,12 +181,12 @@ Handle<Value> GetMacAddress(const Arguments& args) {
 #endif
 
   // Copy mac address to a v8 string
-  return scope.Close(String::New(formattedMacAddress));
+  NanReturnValue(NanNew<String>(formattedMacAddress));
 }
 
 void Init(Handle<Object> target) {
-  target->Set(String::NewSymbol("getMacAddress"),
-      FunctionTemplate::New(GetMacAddress)->GetFunction());
+  target->Set(NanNew<String>("getMacAddress"),
+      NanNew<FunctionTemplate>(GetMacAddress)->GetFunction());
 }
 
 NODE_MODULE(netif, Init)
