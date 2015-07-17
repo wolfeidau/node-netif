@@ -7,5 +7,8 @@ node_js:
   - "iojs"
 install:
   - npm install --build-from-source
+script:
   - npm run-script package
-  - ls build/stage/${TRAVIS_REPO_SLUG}/releases/download/${TRAVIS_TAG}/*.tar.gz
+  - if [ -n "${TRAVIS_TAG}" ]; then ls -l build/stage/${TRAVIS_REPO_SLUG}/releases/download/${TRAVIS_TAG} ; fi
+test:
+  - npm test

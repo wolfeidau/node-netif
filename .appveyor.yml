@@ -1,0 +1,29 @@
+environment:
+  matrix:
+    - nodejs_version: 0.8
+    - nodejs_version: 0.10
+    - nodejs_version: 0.12
+    - nodejs_version: 1.0
+platform:
+ - x86
+ - x64
+install:
+  - SET "PATH=node_modules\.bin;%PATH%"
+  - SET "GYP_MSVS_VERSION=2013"
+  - IF %platform% == x64 (
+      SET "ARCHPATH=x64/" ;
+      SET "PATH=C:\Python27-x64;%PATH%" ;
+      CALL "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" amd64
+    )
+  - IF %platform% == x86 (
+      SET "ARCHPATH=" ;
+      SET "PATH=C:\Python27;%PATH%" ;
+      CALL "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" amd64_86
+    )
+  - ps: Install-Product node $env:nodejs_version $env:platform
+  - npm install --build-from-source
+build_script:
+  - npm run-script package
+  - IF NOT "%APPVEYOR_REPO_TAG_NAME%" == "" ( dir build\stage\%APPVEYOR_REPO_PATH%\releases\download\%APPVEYOR_REPO_TAG_NAME% )
+test_script:
+  - IF NOT "%nodejs_version%" == "1.0" ( npm test )

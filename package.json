@@ -34,7 +34,7 @@
   "scripts": {
     "install": "node-pre-gyp install --fallback-to-build",
     "package": "node-pre-gyp package",
-    "test": "make test"
+    "test": "nodeunit test"
   },
   "dependencies": {
     "nan": "~1.8.4",
