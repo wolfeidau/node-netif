@@ -1,7 +1,6 @@
 sudo: false
 language: node_js
 node_js:
-  - "0.8"
   - "0.10"
   - "0.12"
   - "iojs"
@@ -10,5 +9,13 @@ install:
 script:
   - npm run-script package
   - if [ -n "${TRAVIS_TAG}" ]; then ls -l build/stage/${TRAVIS_REPO_SLUG}/releases/download/${TRAVIS_TAG} ; fi
-test:
   - npm test
+deploy:
+  - provider: releases
+    file_glob: true
+    file: build/stage/${TRAVIS_REPO_SLUG}/releases/download/${TRAVIS_TAG}/*.tar.gz
+    skip_cleanup: true
+    api_key:
+      secure: OzxP0xdaX9bBdxvj/yqnFQ3rUHU1iVBXNX6a6bXWs68Bxhg+t5cjHxa8ECGMby1R4U+vQvENvyK8/8FzSu55rKPYyoj3k0Gc4diy+6UIHUDZAwk5zJl+914JhMGYdXRDx2dGOwM8xeEaNU0PUV0LT+AX+TbuyfFIsgnB/+V56iiCVI7or9jF0oqR5Txw7vgm7xicaKUvTZ6q05evoVtu9Woo0AypQqLChXPTy/pQIWvDZn8kQtsBqXz+hg97HIrxRKwp/ZVRENw6Y1CE2cGGMjynnYiI4s5KTuYsljD809wz3+7ozlijPw3JDh+qzzIR7R2vjgYgt0DGA193gxnNAxXxGQB3cAXrqr5hHlWzB+CcBisMK4XNHikGdCofup5be+NYHuyFgAep7N0lvfE3RUJC7DJAL0LQOhBSgI3es2th0hfAdSvW12ELOggbpaO0DFmIn0oTSiptDdneSUrXDCdmQIJGeYFlkKrLES1D96geT4cKaKI9vEDcU5S+Jwlv6p6nXydJ9OfsK27DFhi6NpSPPkvVAeqdqlj3MZvLq+Kh7fMrh3aSMve/Gm0SNuieSi/paU0qU2e8fr5L5pEIixL4HPhG8bTVx06TB9i4KOhqym+Y6GY3xqdSiEhuUFYF6EQnCJUiv/31XbN2FWgF5lxNobJwDeAVRMzcQpIGgFw=
+    on:
+      tags: true

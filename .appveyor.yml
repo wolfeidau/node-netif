@@ -1,6 +1,5 @@
 environment:
   matrix:
-    - nodejs_version: 0.8
     - nodejs_version: 0.10
     - nodejs_version: 0.12
     - nodejs_version: 1.0
@@ -8,7 +7,6 @@ platform:
  - x86
  - x64
 install:
-  - SET "PATH=node_modules\.bin;%PATH%"
   - SET "GYP_MSVS_VERSION=2013"
   - IF %platform% == x64 (
       SET "ARCHPATH=x64/" ;
@@ -20,6 +18,7 @@ install:
       SET "PATH=C:\Python27;%PATH%" ;
       CALL "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" amd64_86
     )
+  - ps: $env:APPVEYOR_REPO_PATH = $env:APPVEYOR_REPO_NAME.replace('/', '\')
   - ps: Install-Product node $env:nodejs_version $env:platform
   - npm install --build-from-source
 build_script:
@@ -27,3 +26,15 @@ build_script:
   - IF NOT "%APPVEYOR_REPO_TAG_NAME%" == "" ( dir build\stage\%APPVEYOR_REPO_PATH%\releases\download\%APPVEYOR_REPO_TAG_NAME% )
 test_script:
   - IF NOT "%nodejs_version%" == "1.0" ( npm test )
+artifacts:
+  - path: build\stage\$(APPVEYOR_REPO_PATH)\releases\download\$(APPVEYOR_REPO_TAG_NAME)\*.tar.gz
+    name: binding
+deploy:
+  - provider: GitHub
+    artifact: binding
+    draft: false
+    prerelease: false
+    auth_token:
+      secure: Y4nMpyIHHm1pH9cekqL5vj6xGSs98R3rgnQVd4awCWrxaO6qq53Ec007qm96lWE6
+    on:
+      appveyor_repo_tag: true
