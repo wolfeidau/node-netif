@@ -1,5 +1,7 @@
+#if !defined(_WIN32)
 #include <sys/socket.h>
 #include <sys/types.h>
+#endif
 
 
 #if defined(__APPLE_CC__) || defined(__APPLE__)
@@ -30,28 +32,32 @@
 #include <stropts.h>
 #endif
 
+#if defined(_WIN32)
+#include <winsock2.h>
+#include <iphlpapi.h>
+#include <stdlib.h>
+#endif
+
 #include <node.h>
+#include <nan.h>
 #include <string.h>
 
 #include "netif.h"
 
 using namespace v8;
 
-Handle<Value> GetMacAddress(const Arguments& args) {
-
-  HandleScope scope;
+NAN_METHOD(GetMacAddress) {
+  NanScope();
 
   if (args.Length() < 1) {
-    ThrowException(Exception::TypeError(String::New("Wrong number of arguments")));
-    return scope.Close(Undefined());
+    NanThrowTypeError("Wrong number of arguments");
   }
 
   if (!args[0]->IsString()) {
-    ThrowException(Exception::TypeError(String::New("Wrong arguments")));
-    return scope.Close(Undefined());
+    NanThrowTypeError("First argument must be a string");
   }
 
-  v8::String::AsciiValue device(args[0]);
+  NanUtf8String device(args[0]);
   char formattedMacAddress[mac_addr_len];
   unsigned char macAddress[ether_addr_len];
 
@@ -72,23 +78,23 @@ Handle<Value> GetMacAddress(const Arguments& args) {
   // With all configured interfaces requested, get handle index
   if ((mgmtInfoBase[5] = if_nametoindex((char *) *device)) == 0) {
 
-    ThrowException(Exception::TypeError(String::New("Error opening interface")));
-    return scope.Close(Undefined());
+    NanThrowTypeError("Error opening interface");
+    NanReturnUndefined();
 
   } else {
 
     // Get the size of the data available (store in len)
     if (sysctl(mgmtInfoBase, ether_addr_len, NULL, &length, NULL, 0) < 0) {
 
-      ThrowException(Exception::TypeError(String::New("sysctl mgmtInfoBase failure")));
-      return scope.Close(Undefined());
+      NanThrowTypeError("sysctl mgmtInfoBase failure");
+      NanReturnUndefined();
     } else {
 
       // Alloc memory based on above call
       if ((messageBuffer= (char *)malloc(length)) == NULL) {
 
-        ThrowException(Exception::TypeError(String::New("message buffer allocation failure")));
-        return scope.Close(Undefined());
+        NanThrowTypeError("message buffer allocation failure");
+        NanReturnUndefined();
       } else {
 
         // Get system information, store in buffer
@@ -97,8 +103,8 @@ Handle<Value> GetMacAddress(const Arguments& args) {
           // Release the buffer memory
           free(messageBuffer);
 
-          ThrowException(Exception::TypeError(String::New("sysctl msgBuffer failure")));
-          return scope.Close(Undefined());
+          NanThrowTypeError("sysctl msgBuffer failure");
+          NanReturnUndefined();
         }
       }
     }
@@ -143,8 +149,8 @@ Handle<Value> GetMacAddress(const Arguments& args) {
   } else {
 
     // TODO lookup the ERR for this and return it to the user for example -1 EMFILE (Too many open files)
-    ThrowException(Exception::TypeError(String::New("Error opening interface")));
-    return scope.Close(Undefined());
+    NanThrowTypeError("Error opening interface");
+    NanReturnUndefined();
   }
 
   // Close the file descriptor
@@ -173,8 +179,8 @@ Handle<Value> GetMacAddress(const Arguments& args) {
   } else {
 
     // TODO lookup the ERR for this and return it to the user for example -1 EMFILE (Too many open files)
-    ThrowException(Exception::TypeError(String::New("error opening interface")));
-    return scope.Close(Undefined());
+    NanThrowTypeError("error opening interface");
+    NanReturnUndefined();
   }
 
   // Close the file descriptor
@@ -182,13 +188,54 @@ Handle<Value> GetMacAddress(const Arguments& args) {
 
 #endif
 
+#if defined(_WIN32)
+
+  IP_ADAPTER_ADDRESSES adapterAddresses[16], *adapterAddress;
+  ULONG size = sizeof(adapterAddresses);
+  ULONG flags = GAA_FLAG_SKIP_UNICAST | GAA_FLAG_SKIP_ANYCAST | GAA_FLAG_SKIP_MULTICAST;
+
+  if (ERROR_SUCCESS == GetAdaptersAddresses(AF_UNSPEC, flags, NULL, &(adapterAddresses[0]), &size)) {
+    adapterAddress = &adapterAddresses[0];
+
+    while (NULL != adapterAddress) {
+      if (0 != strcmp(adapterAddress->AdapterName, *device)) {
+        break;
+      }
+      adapterAddress = adapterAddress->Next;
+    }
+
+    if (NULL == adapterAddress) {
+      NanThrowTypeError("unknown interface");
+      NanReturnUndefined();
+    }
+    if (adapterAddress->PhysicalAddressLength != ether_addr_len) {
+      NanThrowTypeError("address length mismatch");
+      NanReturnUndefined();
+    }
+
+    // Copy link layer address data in socket structure to an array
+    memcpy(&macAddress, adapterAddress->PhysicalAddress, ether_addr_len);
+
+    sprintf(formattedMacAddress, "%02X:%02X:%02X:%02X:%02X:%02X",
+        macAddress[0], macAddress[1], macAddress[2],
+        macAddress[3], macAddress[4], macAddress[5]);
+
+  } else {
+
+    // TODO lookup the ERR for this and return it to the user
+    NanThrowTypeError("error obtaining adapter addresses");
+    NanReturnUndefined();
+  }
+
+#endif
+
   // Copy mac address to a v8 string
-  return scope.Close(String::New(formattedMacAddress));
+  NanReturnValue(NanNew<String>(formattedMacAddress));
 }
 
 void Init(Handle<Object> target) {
-  target->Set(String::NewSymbol("getMacAddress"),
-      FunctionTemplate::New(GetMacAddress)->GetFunction());
+  target->Set(NanNew<String>("getMacAddress"),
+      NanNew<FunctionTemplate>(GetMacAddress)->GetFunction());
 }
 
 NODE_MODULE(netif, Init)

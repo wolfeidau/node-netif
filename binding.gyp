@@ -1,9 +1,33 @@
 {
     "targets":[
         {
-            "target_name":"netif",
+            "target_name":"<(module_name)",
             "sources":[
                 "src/netif.cc"
+            ],
+            "include_dirs":[
+                "<!(node -e \"require('nan')\")"
+            ],
+            "conditions":[
+                [
+                    "OS=='win'",
+                    {
+                        "link_settings":{
+                            "libraries":["iphlpapi.lib"]
+                        }
+                    }
+                ]
+            ]
+        },
+        {
+            "target_name":"action_after_build",
+            "type":"none",
+            "dependencies":["<(module_name)"],
+            "copies":[
+                {
+                    "files":["<(PRODUCT_DIR)/<(module_name).node"],
+                    "destination":"<(module_path)"
+                }
             ]
         }
     ]

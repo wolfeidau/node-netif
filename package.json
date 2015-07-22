@@ -21,18 +21,30 @@
     }
   ],
   "main": "lib/netif",
+  "binary": {
+    "module_name": "netif",
+    "module_path": "./lib/binding/{node_abi}-{platform}-{arch}",
+    "host": "https://github.com",
+    "remote_path": "/wolfeidau/node-{name}/releases/download/v{version}/",
+    "package_name": "{module_name}-{node_abi}-{platform}-{arch}.tar.gz"
+  },
   "engines": {
     "node": ">= 0.6.0"
   },
   "scripts": {
-    "install": "node-gyp rebuild",
-    "test": "make test"
+    "install": "node-pre-gyp install --fallback-to-build",
+    "package": "node-pre-gyp package",
+    "test": "nodeunit test"
   },
   "dependencies": {
-    "bindings": "1.0.0"
+    "nan": "~1.8.4",
+    "node-pre-gyp": "~0.6.8"
   },
+  "bundledDependencies": [
+    "node-pre-gyp"
+  ],
   "devDependencies": {
-    "nodeunit": "*"
+    "nodeunit": "~0.8.8"
   },
   "keywords": [
     "ifconfig",

@@ -5,18 +5,18 @@ all: test
 build: clean configure compile
 
 configure:
-		node-gyp configure
+		node-pre-gyp configure
 
 compile: configure
-		node-gyp build
-			npm install .
+		node-pre-gyp build
+		npm install .
 
 test: build
 		@./node_modules/nodeunit/bin/nodeunit \
 					$(TESTS)
 
 clean:
-		node-gyp clean
+		node-pre-gyp clean
 
 
 .PHONY: clean test build

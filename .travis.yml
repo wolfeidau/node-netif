@@ -1,7 +1,21 @@
+sudo: false
 language: node_js
 node_js:
-  - "0.8"
   - "0.10"
-env: 
-    global:
-     - TRAVIS=true
+  - "0.12"
+  - "iojs"
+install:
+  - npm install --build-from-source
+script:
+  - npm run-script package
+  - if [ -n "${TRAVIS_TAG}" ]; then ls -l build/stage/${TRAVIS_REPO_SLUG}/releases/download/${TRAVIS_TAG} ; fi
+  - npm test
+deploy:
+  - provider: releases
+    file_glob: true
+    file: build/stage/${TRAVIS_REPO_SLUG}/releases/download/${TRAVIS_TAG}/*.tar.gz
+    skip_cleanup: true
+    api_key:
+      secure: "NBK4l4BI/XeOuoi9azTi6fwLT2Q3Mek7wodW2Wnx4CQcmwCGp7+fDXIPwVdmJMg4g5CosC8sOTdR9I7t9hSZ/xK3hIzXXMc17hKZ2BrViCCj06Hee1q1042LlycWPrFM8O84jzAnnR1iKJdiArQr+SY5TvLIs94JFzYUqQG8cDQ="
+    on:
+      tags: true
