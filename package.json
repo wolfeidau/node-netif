@@ -1,7 +1,7 @@
 {
   "name": "netif",
   "description": "Node wrapper for net/if.h",
-  "version": "0.2.0-rc1",
+  "version": "0.2.0-rc2",
   "homepage": "https://github.com/wolfeidau/node-netif",
   "author": {
     "name": "Mark Wolfe",
