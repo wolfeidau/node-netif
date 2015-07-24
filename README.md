@@ -6,7 +6,7 @@ a given interface name.
 Currently works on OSX, Solaris, Linux and Windows. Maybe FreeBSD is next?
 
 [![Build Status](https://secure.travis-ci.org/wolfeidau/node-netif.png)](http://travis-ci.org/wolfeidau/node-netif)
-[![Build status](https://ci.appveyor.com/api/projects/status/8f4i2p4t2hk4hc9h?svg=true)](https://ci.appveyor.com/project/jpommerening/node-netif)
+[![Build status](https://ci.appveyor.com/api/projects/status/github/wolfeidau/node-netif?svg=true)](https://ci.appveyor.com/project/wolfeidau/node-netif)
 
 ## Getting Started
 Install the module with: `npm install netif`
